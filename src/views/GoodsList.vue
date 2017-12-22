@@ -1,6 +1,6 @@
 <template>
     <div>
-      <nav-header></nav-header>
+      <nav-header :loginUserName="userName"></nav-header>
       <nav-bread>
         <span>Goods</span>
       </nav-bread>
@@ -52,6 +52,28 @@
                 </div>
             </div>
         </div>
+      <modal :mdShow="mdShow" @close="closeModal">
+         <h2 slot="message">请先登录,否则无法加入到购物车中!</h2>
+          <div slot="btnGroup">
+              <a class="btn btn--m" href="javascript:;" @click="mdShow = false">关闭</a>
+          </div>
+      </modal>
+      <login :loginModalFlag="loginModalFlag" @closeLogin="closeLoginPage" @loginSuc="addCart">
+          <h2 class="error-show"></h2>
+      </login>
+      <modal :mdShow="mdShowCart" @close="closeCart">
+          <p slot="message">
+              <svg class="icon-status-ok">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-status-ok"></use>
+              </svg>
+              <span>加入购物车成!</span>
+          </p>
+          <div slot="btnGroup">
+              <a class="btn btn--m" href="javascript:;" @click="mdShowCart = false">继续购物</a>
+              <router-link class="btn btn--m btn--red" href="javascript:;" to="/cart">查看购物车</router-link>
+          </div>
+      </modal>
+      <div class="md-overlay" v-if="loginModalFlag" @click="loginModalFlag=false"></div>
       <nav-footer></nav-footer>
     </div>
 </template>
@@ -59,7 +81,8 @@
     import NavHeader from './../components/NavHeader.vue'
     import NavFooter from './../components/NavFooter.vue'
     import NavBread from './../components/NavBread.vue'
-    import axios from 'axios'
+    import Modal from './../components/Modal.vue'
+    import Login from './../components/Login.vue'
     export default{
         data(){
             return {
@@ -71,34 +94,38 @@
                 loading:false,
                 mdShow:false,
                 mdShowCart:false,
-                priceFilter:[
-                  {
-                      startPrice:'0.00',
-                      endPrice:'100.00'
-                  },
-                  {
-                    startPrice:'100.00',
-                    endPrice:'500.00'
-                  },
-                  {
-                    startPrice:'500.00',
-                    endPrice:'1000.00'
-                  },
-                  {
-                    startPrice:'1000.00',
-                    endPrice:'5000.00'
-                  }
-                ],
                 startPrice:'all',
                 endPrice:'all',
+                priceFilter:[
+                    {
+                        startPrice:'0.00',
+                        endPrice:'100.00'
+                    },
+                    {
+                        startPrice:'100.00',
+                        endPrice:'500.00'
+                    },
+                    {
+                        startPrice:'500.00',
+                        endPrice:'1000.00'
+                    },
+                    {
+                        startPrice:'1000.00',
+                        endPrice:'5000.00'
+                    }
+                ],
                 filterBy:false,
-                overLayFlag:false
+                overLayFlag:false,
+                loginModalFlag:false,
+                userName:''
             }
         },
         components:{
           NavHeader,
           NavFooter,
-          NavBread
+          NavBread,
+          Modal,
+          Login
         },
         created(){
             this.getGoodsList();
@@ -153,15 +180,33 @@
                 this.page = 1;
                 this.getGoodsList();
             },
+            closeModal(){
+                this.mdShow = false;
+            },
             addCart(productId){
-                axios.post('/goods/addCart',{
-                    productId:productId
-                }).then((response) =>{
-                    const res = response.data;
-                    if(res.status === '1'){
-
-                    }
-                })
+                if(!getCookie('userId')){ //不存在userId
+                    this.loginModalFlag = true
+                }else{
+                    this.mdShowCart = true;
+                    this.userName = getCookie('userName');
+//                    axios.post('/goods/addCart',{
+//                        productId:productId
+//                    }).then((response) =>{
+//                        const res = response.data;
+//                        if(res.status === '1'){
+//
+//                        }else{
+//
+//                        }
+//                    })
+                }
+            },
+            closeLoginPage(userName){
+                this.loginModalFlag = false;
+                this.userName = userName;
+            },
+            closeCart(){
+                this.mdShowCart = false;
             }
         }
     }

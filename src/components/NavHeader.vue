@@ -28,7 +28,9 @@
             </div>
             <div class="navbar-right-container" style="display: flex;">
               <div class="navbar-menu-container">
-                <a href="javascript:void(0)" class="navbar-link">Login</a>
+                <span class="navbar-link" v-if="userName" v-text="userName"></span>
+                <a href="javascript:void(0)" class="navbar-link" v-if="!userName" @click="editLogin(true)">Login</a>
+                <a href="javascript:void(0)" class="navbar-link" v-if="userName" @click="mdShow=true">Logout</a>
                 <div class="navbar-cart-container">
                   <a class="navbar-link navbar-cart-link" href="/#/cart">
                     <svg class="navbar-cart-logo">
@@ -39,36 +41,71 @@
               </div>
             </div>
         </div>
-        <div class="md-modal modal-msg md-modal-transition" v-bind:class="{'md-show':loginModalFlag}">
-          <div class="md-modal-inner">
-            <div class="md-top">
-              <div class="md-title">Login in</div>
-              <button class="md-close">Close</button>
-            </div>
-            <div class="md-content">
-              <div class="confirm-tips">
-                <div class="error-wrap">
-                  <span class="error error-show" v-show="errorTip">用户名或者密码错误</span>
-                </div>
-                <ul>
-                  <li class="regi_form_input">
-                    <i class="icon IconPeople"></i>
-                    <input type="text" tabindex="1" name="loginname" v-model="userName" class="regi_login_input regi_login_input_left" placeholder="User Name" data-type="loginname">
-                  </li>
-                  <li class="regi_form_input noMargin">
-                    <i class="icon IconPwd"></i>
-                    <input type="password" tabindex="2"  name="password" v-model="userPwd" class="regi_login_input regi_login_input_left login-input-no input_text" placeholder="Password">
-                  </li>
-                </ul>
-              </div>
-              <div class="login-wrap">
-                <a href="javascript:;" class="btn-login">登  录</a>
-              </div>
-            </div>
+        <modal :mdShow="mdShow" @close="mdShow = false">
+          <h2 slot="message">确定要登出么!</h2>
+          <div slot="btnGroup">
+              <a class="btn btn--m" href="javascript:;" @click="mdShow = false">取消</a>
+              <a class="btn btn--m" href="javascript:;" @click="editLogin(false)">确定</a>
           </div>
-        </div>
+        </modal>
+        <login :loginModalFlag="loginModalFlag" @closeLogin="closeLoginPage"></login>
+        <div class="md-overlay" v-if="loginModalFlag" @click="loginModalFlag=false"></div>
     </header>
 </template>
+<script>
+    import './../assets/css/login.css'
+    import Modal from './Modal.vue'
+    import Login from './Login.vue'
+    export default{
+        props:['loginUserName'],
+        data(){
+            return{
+              mdShow:false,
+              userName:'',
+              errorTip:false,
+              loginModalFlag:false
+            }
+        },
+        watch:{
+           loginUserName:function(val,oldVal){
+               console.log(this.userName)
+//               this.userName = val;
+//               console.log(val)
+               
+           }
+        },
+        components:{
+            Modal,
+            Login
+        },
+        methods:{
+            closeLoginPage(userName){
+               this.userName = userName;
+               this.loginModalFlag = false;
+            },
+            editLogin(login){
+                if(login){ //点击登录
+                    this.loginModalFlag = true;
+                }else{ //点击登出
+                    axios.post('users/logout').then((response)=>{
+                       const res = response.data;
+                       if(res.status==='1'){
+                           this.mdShow = false;
+                           this.userName = '';
+                       }
+                    });
+
+                }
+            }
+        }
+        /*nickName(){
+          return this.$store.state.nickName;
+        },
+        cartCount(){
+          return this.$store.state.cartCount;
+        }*/
+    }
+</script>
 <style>
   .header {
     width: 100%;
@@ -143,23 +180,3 @@
     transform: scaleX(-1);
   }
 </style>
-<script>
-    import './../assets/css/login.css'
-    import axios from 'axios'
-    export default{
-        data(){
-            return{
-              userName:'admin',
-              userPwd:'123456',
-              errorTip:false,
-              loginModalFlag:false
-            }
-        },
-        /*nickName(){
-          return this.$store.state.nickName;
-        },
-        cartCount(){
-          return this.$store.state.cartCount;
-        }*/
-    }
-</script>

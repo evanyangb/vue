@@ -10,7 +10,6 @@ var ejs = require('ejs');
 var routes = require('./routes');
 var users = require('./routes/user');
 var goods = require('./routes/goods');
-console.log(goods)
 
 var app = express();
 
@@ -38,7 +37,9 @@ app.all('*',function(req,res,next){
 
 
 app.get('/', routes.index);
-app.get('/users', users.list);
+app.post('/users/login', users.login);
+app.post('/users/logout',users.logout);
+app.get('/users/checkLogin',users.checkLogin);
 app.get('/goods/list',goods.goodsList);
 app.post('/goods/addCart',goods.goodsAddCart);
 
