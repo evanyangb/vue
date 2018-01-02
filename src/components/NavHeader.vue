@@ -63,15 +63,12 @@
               mdShow:false,
               userName:'',
               errorTip:false,
-              loginModalFlag:false
+              loginModalFlag:false,
             }
         },
         watch:{
-           loginUserName:function(val,oldVal){
-               console.log(this.userName)
-//               this.userName = val;
-//               console.log(val)
-               
+            loginUserName(val,oldVal){
+               this.userName = val;
            }
         },
         components:{

@@ -3,7 +3,7 @@
         <div class="md-modal-inner">
             <div class="md-top">
                 <div class="md-title">Login in</div>
-                <button class="md-close" @click="closeLoginPage">Close</button>
+                <button class="md-close" @click="closeLoginPage()">Close</button>
             </div>
             <div class="md-content">
                 <div class="confirm-tips">
@@ -14,7 +14,7 @@
                     <ul>
                         <li class="regi_form_input">
                             <i class="icon IconPeople"></i>
-                            <input type="text" tabindex="1" name="loginName" v-model="userName" class="regi_login_input regi_login_input_left" placeholder="User Name">
+                            <input type="text" tabindex="1" name="loginName" @custom-blur="blur2(event)" v-model="userName" class="regi_login_input regi_login_input_left" placeholder="User Name">
                         </li>
                         <li class="regi_form_input noMargin">
                             <i class="icon IconPwd"></i>
@@ -39,9 +39,19 @@
                 userPwd:''
             }
         },
+        watch:{
+            loginModalFlag:function(val){
+                console.log(this)
+                this.$emit('custom-blur');
+            }
+        },
         methods:{
             closeLoginPage(userName){
                this.$emit('closeLogin',userName||'')
+            },
+            blur2(event){
+                console.log(123)
+                event.target.focus();
             },
             login(){
                 if(!this.userName && !this.userPwd){
