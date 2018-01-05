@@ -14,7 +14,7 @@
                     <ul>
                         <li class="regi_form_input">
                             <i class="icon IconPeople"></i>
-                            <input type="text" tabindex="1" name="loginName" @custom-blur="blur2(event)" v-model="userName" class="regi_login_input regi_login_input_left" placeholder="User Name">
+                            <input type="text" tabindex="1" name="loginName" ref="aaa" v-model="userName" class="regi_login_input regi_login_input_left" placeholder="User Name">
                         </li>
                         <li class="regi_form_input noMargin">
                             <i class="icon IconPwd"></i>
@@ -40,18 +40,15 @@
             }
         },
         watch:{
-            loginModalFlag:function(val){
-                console.log(this)
-                this.$emit('custom-blur');
+            'loginModalFlag':function(val){
+                val && setTimeout(()=>{
+                    this.$refs.aaa.focus();
+                },50) 
             }
         },
         methods:{
             closeLoginPage(userName){
                this.$emit('closeLogin',userName||'')
-            },
-            blur2(event){
-                console.log(123)
-                event.target.focus();
             },
             login(){
                 if(!this.userName && !this.userPwd){
