@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view></router-view>
+    <p>你好version——version1.1.1</p>
   </div>
 </template>
 
